@@ -1,7 +1,7 @@
 elveg2osm
 =========
 
-Conversion from Elveg data to openstreetmap
+Conversion from Elveg data to OpenStreetMap
 
 #Usage:
 `elveg2osm.py dir XXXX`
@@ -14,7 +14,7 @@ and at least the file `XXXXFart.txt`.
 XXXX is the 4-digit number representing the municipality listed at http://www.statkart.no/Kunnskap/Fakta-om-Norge/Fylker-og-kommuner/Tabell/
 
 #Requirements:
-- sosi2osm:      For converting the initial SOSI file to osm-format (without changing the tags)
+- sosi2osm:      For converting the initial SOSI file to OSM-format (without changing the tags)
    - Source code at https://github.com/Gnonthgol/sosi2osm
    - Ubuntu PPA at http://ppa.launchpad.net/saltmakrell/osm/ubuntu/
    - Available in Debian unstable
