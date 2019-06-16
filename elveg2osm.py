@@ -163,17 +163,34 @@ def create_osmtags(elveg_tags):
             warn(u"VNR missing for OBJTYPE {OBJTYPE} with TRANSID {TRANSID}".format(**elveg_tags))
             return osmtags
 
+        # Get parsell code
+        if elveg_tags.has_key('VPA'):
+            hp = int(elveg_tags.split("; ")[0])
+        else:
+            hp = 0
+
         # There are more vegstatus values than listed in https://wiki.openstreetmap.org/w/images/c/cc/Elveg_SOSI_4.0_2008.pdf
         # There is a more complete list in chapter 7.3.11 in 
         # http://www.statkart.no/Documents/Standard/SOSI-standarden%20del%201%20og%202/SOSI%20standarden/Vegnett.pdf
+        # Fylkesveg is primary if vegnummer has 2 or 3 digits, and secondary if 4 digits (complete in NVDB from 1 July 2019)
 
         if elveg_tags['OBJTYPE'] in roadOBJTYPEs:
             # Set the road category
-            if vegstatus in ['V','T','W']: # Eksisterende veg, Veg med midlertidig status, Midlertidig veg mer enn et aar
-                osmtags['highway'] = category2highwayclass[vegkategori]
-            elif vegstatus == 'A':
-                osmtags['highway'] = 'construction'
-                osmtags['construction'] = category2highwayclass[vegkategori]
+            if vegstatus in ['V','T','W','A']:
+                if hp / 100 == 8:  # Trafikklommer/rasteplasser
+                    highway_class = 'unclassified'
+                else:
+                    if vegkategori == 'F' and int(vegnummer) < 1000:  # After reform 2019
+                        highway_class = 'primary'
+                    else:
+                        highway_class = category2highwayclass[vegkategori]
+                    if vegkategori in ['E','R','F'] and hp >= 70 and hp <= 199:  # Ramper
+                        highway_class += '_link'
+                if vegstatus in ['V','T','W']: # Eksisterende veg, Veg med midlertidig status, Midlertidig veg mer enn et aar
+                    osmtags['highway'] = highway_class
+                elif vegstatus == 'A': # Anleggsveg 
+                    osmtags['highway'] = 'construction'
+                    osmtags['construction'] = highway_class
             elif vegstatus == 'G':
                 osmtags['FIXME'] = u'Veggrunn, ikke trafikkform\xe5l. Select appropriate road type.'
                 osmtags['highway'] = 'road'
@@ -196,10 +213,11 @@ def create_osmtags(elveg_tags):
                 warn(u"Ferry route with TRANSID {0} has unknown vegstatus {1}".format(elveg_tags['TRANSID'],vegstatus))
 
         # Add ref to road kategories Europaveg, Riksveg and Fylkesveg
-        if vegkategori == 'E':
-            osmtags['ref'] = 'E ' + vegnummer
-        elif vegkategori in ['R', 'F']:
-            osmtags['ref'] = vegnummer
+        if hp / 100 != 8:  # Avoid trafikklommer/rasteplasser
+            if vegkategori == 'E':
+                osmtags['ref'] = 'E ' + vegnummer
+            elif vegkategori in ['R', 'F']:
+                osmtags['ref'] = vegnummer
 
     # Gang- og sykkelveg. Only a fraction of all of those are in the data. 
     # Nevertheless, include those that are.
@@ -262,7 +280,10 @@ def create_osmtags(elveg_tags):
                 osmtags['oneway'] = '-1'
             else:
                 # This reacts to cycleways in Trondheim with lane_code 1#2#3S#4S
-                warn(u"Ignoring VKJORFLT tag for GangSykkelVegSenterlinje with TRANSID {TRANSID}: {VKJORFLT}".format(**elveg_tags)) 
+                warn(u"Ignoring VKJORFLT tag for GangSykkelVegSenterlinje with TRANSID {TRANSID}: {VKJORFLT}".format(**elveg_tags))
+        elif elveg_tags['OBJTYPE'] == 'SykkelVegSenterlinje':
+            if lane_code == '1S#2S':
+                osmtags['lanes'] = '2'
         else:
             # Not road, not cycleway
             if lane_code != '1#2':  # No warning for default 1#2
@@ -945,14 +966,10 @@ for id,way in osmobj.ways.iteritems():
     if (way.tags.has_key('maxspeed:backward') and not way.tags.has_key('maxspeed:forward')):
         way.tags['maxspeed'] = way.tags['maxspeed:backward']
         del way.tags['maxspeed:backward']
-    # Remove the default speed limit of 50, since that may
-    # be only due to missing reporting
-    if (way.tags.get('maxspeed', None) == '50' and 
-            way.tags.get('highway',None) not in ('trunk', 'secondary')):
-        del way.tags['maxspeed']
     # Remove speed limits for non-roads (footway, cycleway, etc.)
     if (way.tags.has_key('maxspeed') and
-            way.tags.get('highway', None) not in ('trunk', 'secondary', 'road', 'unclassified', 'residential', 'service')):
+            way.tags.get('highway', None) not in ('trunk', 'primary', 'secondary', 'residential', \
+                                                  'trunk_link', 'primary_link', 'secondary_link', 'residential_link')):
         del way.tags['maxspeed']
 
 # Save barriers that are not merged to other nodes to a separate file
@@ -995,6 +1012,7 @@ for id,way in osmobj.ways.iteritems():
 osmobj.save(osm_output)
 osmobj_barriers.save(osm_barrier_output)
 osmobj_deleted.save(osm_deleted_output)
+
 
 
 
