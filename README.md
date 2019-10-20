@@ -3,6 +3,9 @@
 Conversion from Elveg data to OpenStreetMap
 
 ## Usage
+
+Get your data files from (Geonorge.no- ELVEG)[https://kartkatalog.geonorge.no/metadata/ed1e6798-b3cf-48be-aee1-c0d3531da01a] and unpack your files
+
 `elveg2osm.py dir XXXX`
 
 The directory dir contains a file called XXXXElveg\_default, which is the
@@ -10,7 +13,7 @@ output of the command
 `sosi2osm XXXXElveg.SOS default.lua >XXXXElveg_default.osm`.
 and at least the file `XXXXFart.txt`.
 
-XXXX is the 4-digit number representing the municipality listed at http://www.statkart.no/Kunnskap/Fakta-om-Norge/Fylker-og-kommuner/Tabell/
+XXXX is the 4-digit municipality number, listed for example at (wikipedia)[https://no.wikipedia.org/wiki/Norges_kommuner#Kommunene]
 
 ## Requirements
 
@@ -23,4 +26,3 @@ XXXX is the 4-digit number representing the municipality listed at http://www.st
 - geographiclib: Python module used for computing distances between nodes
    - Home page at http://geographiclib.sourceforge.net/
    - Source code at https://pypi.python.org/pypi/geographiclib
-
