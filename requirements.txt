@@ -1,0 +1,2 @@
+-e https://github.com/osmno/osmapis.git#egg=osmapis
+geographiclib>=1.5
