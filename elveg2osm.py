@@ -171,7 +171,7 @@ def create_osmtags(elveg_tags):
 
         # There are more vegstatus values than listed in https://wiki.openstreetmap.org/w/images/c/cc/Elveg_SOSI_4.0_2008.pdf
         # There is a more complete list in chapter 7.3.11 in 
-        # http://www.statkart.no/Documents/Standard/SOSI-standarden%20del%201%20og%202/SOSI%20standarden/Vegnett.pdf
+        # https://www.kartverket.no/globalassets/standard/sosi-standarden-del-1-og-2/sosi-standarden/vegnett.pdf
         # Fylkesveg is primary if vegnummer has 2 or 3 digits, and secondary if 4 digits (complete in NVDB from 1 July 2019)
 
         if elveg_tags['OBJTYPE'] in roadOBJTYPEs:
