@@ -2,6 +2,11 @@
 
 Conversion from Norwegian ELVEG road-data to OpenStreetMap
 
+## ARCHIVED
+
+This project is archived. See [nvdb2osm](https://github.com/NKAmapper/nvdb2osm) for the new import tool, which uses the API from Nasjonal Vegdatabase 
+
+
 ## Usage
 
 **Note:** elveg2osm only works with `python2`, not with `python3`. You need to install the requirements with `pip2` and run the program with `python2` if both are installed.
